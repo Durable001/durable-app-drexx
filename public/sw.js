@@ -3,7 +3,7 @@
  *  - caches only immutable build assets (/_next/static) and icons
  *  - shows /offline.html when a page navigation fails
  */
-const VERSION = "v1";
+const VERSION = "v2";
 const STATIC_CACHE = `static-${VERSION}`;
 const OFFLINE_URL = "/offline.html";
 const PRECACHE = [OFFLINE_URL, "/icons/icon-192.png", "/icons/icon-512.png"];

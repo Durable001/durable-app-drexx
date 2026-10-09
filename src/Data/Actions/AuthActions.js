@@ -112,6 +112,14 @@ export const loadUser = () => async dispatch => {
 			// baseURL: type === "data" ? useURL2 || useURL : useURL,
 		});
 		if (res?.data?.data) {
+			// The server rotates the access token when the old one has < 6h left and ALREADY
+			// invalidates the old one for writes. Keep axios on the new token as well as
+			// localStorage, otherwise every purchase / virtual-account call is sent with the
+			// stale token and fails with "Session timeout, please login again".
+			if (res.data.token) {
+				localStorage.setItem(TOKEN, res.data.token);
+				SetAuthToken(res.data.token);
+			}
 			dispatch({
 				type: GET_USER,
 				payload: res.data,

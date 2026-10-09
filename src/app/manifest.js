@@ -14,7 +14,7 @@ export default function manifest() {
     launch_handler: { client_mode: ["focus-existing", "auto"] },
     display: "standalone",
     background_color: "#ffffff",
-    theme_color: "#c20e9c",
+    theme_color: "#3c0b5b",
     lang: "en",
     categories: ["finance", "utilities"],
     icons: [

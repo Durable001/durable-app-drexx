@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#c20e9c" />
+<meta name="theme-color" content="#3c0b5b" />
 <title>You're offline</title>
 <style>
   *{box-sizing:border-box}
@@ -11,16 +11,56 @@
   .card{max-width:360px}
   img{width:72px;height:72px;border-radius:18px;box-shadow:0 8px 24px rgba(34,6,54,.18);margin-bottom:20px}
   h1{font-size:1.4rem;margin:0 0 8px}
-  p{margin:0 0 24px;color:#5a4a6b;line-height:1.5}
-  button{border:0;border-radius:12px;background:#c20e9c;color:#fff;font-weight:600;font-size:1rem;padding:12px 28px}
+  p{margin:0 0 24px;color:#5a4a6b;line-height:1.5;min-height:4.5em}
+  button{border:0;border-radius:12px;background:#3c0b5b;color:#fff;font-weight:600;font-size:1rem;padding:12px 28px;cursor:pointer}
+  button:disabled{opacity:.6;cursor:default}
 </style>
 </head>
 <body>
   <div class="card">
     <img src="/icons/icon-192.png" alt="" />
     <h1>You're offline</h1>
-    <p>Check your internet connection and try again. Your wallet and transactions are safe.</p>
-    <button onclick="location.reload()">Try again</button>
+    <p id="msg">As strange as it sounds, you need to have internet connection to buy internet connection. 😂😂</p>
+    <button id="retry" type="button">Try again</button>
   </div>
+<script>
+(function () {
+  var IDLE = "As strange as it sounds, you need to have internet connection to buy internet connection. 😂😂";
+  var CHECKING = "No wahala, let's see if we can get you back in...";
+  var msg = document.getElementById("msg");
+  var btn = document.getElementById("retry");
+  var busy = false;
+
+  // /manifest.webmanifest is not handled by the service worker, so this really hits the network
+  // (the offline page and icons are served from cache and would always "succeed").
+  function probe() {
+    var ctrl = typeof AbortController === "function" ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 6000);
+    return fetch("/manifest.webmanifest?_=" + Date.now(), { cache: "no-store", signal: ctrl ? ctrl.signal : undefined })
+      .then(function (res) { clearTimeout(timer); return res.ok; })
+      .catch(function () { clearTimeout(timer); return false; });
+  }
+
+  function check() {
+    if (busy) return;
+    busy = true;
+    btn.disabled = true;
+    btn.textContent = "Checking...";
+    msg.textContent = CHECKING;
+    // keep the "checking" message readable even when the failure is instant
+    var minWait = new Promise(function (r) { setTimeout(r, 1200); });
+    Promise.all([probe(), minWait]).then(function (r) {
+      if (r[0]) { location.reload(); return; }
+      busy = false;
+      btn.disabled = false;
+      btn.textContent = "Try again";
+      msg.textContent = IDLE;
+    });
+  }
+
+  btn.addEventListener("click", check);
+  window.addEventListener("online", check);
+})();
+</script>
 </body>
 </html>
