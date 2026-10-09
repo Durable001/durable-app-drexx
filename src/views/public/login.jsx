@@ -73,7 +73,7 @@ const Login = () => {
 									? "Authenticator App"
 									: "Email"
 						  }`
-						: `Data abi? Oya come!`}
+						: `Cheap Data abi? Oya come!`}
 				</small>
 				{step !== 1 ? (
 					<>

@@ -19,6 +19,8 @@ import { usePaystackPayment } from "react-paystack";
 // import { useMonnifyPayment } from "react-monnify";
 import { MainPaginate, MainRanger } from "@/features/Transactions";
 import { TransactionPinBox } from "@/features/Products/AutoBuy";
+import PocketfiLinkedAccount from "@/features/Wallets/PocketfiLinkedAccount";
+import { usePocketfiBanks } from "@/hooks/usePocketfiBanks";
 
 let colorArr = ["#E9F9F9", "#C0938E", "#000000", "#B3CEDE"];
 
@@ -1329,10 +1331,12 @@ const MakeWithdraw = ({ isOpen, back }) => {
 
 const MakeVirtual = ({ isOpen, back }) => {
 	const { wallet, generateVirtual, usecase } = useContext(GlobalState);
+	const pocketfiBanks = usePocketfiBanks(usecase);
 	let [loading, setLoading] = useState(false),
 		ableToGenerateBudpay = false,
 		ableToGeneratePayvessel = false,
 		ableToGeneratePaymentpoint = false,
+		ableToGeneratePocketfi = false,
 		ableToGenerateBillstack = false,
 		ableToGeneratePalmpay = false;
 
@@ -1342,6 +1346,7 @@ const MakeVirtual = ({ isOpen, back }) => {
 		if (values?.includes("budpay")) ableToGenerateBudpay = true;
 		if (values?.includes("payvessel")) ableToGeneratePayvessel = true;
 		if (values?.includes("paymentpoint")) ableToGeneratePaymentpoint = true;
+		if (values?.includes("pocketfi")) ableToGeneratePocketfi = true;
 		if (values?.includes("billstack")) ableToGenerateBillstack = true;
 		if (values?.includes("palmpay")) ableToGeneratePalmpay = true;
 	}
@@ -1588,6 +1593,22 @@ const MakeVirtual = ({ isOpen, back }) => {
 									/>
 								)}
 							</>
+						)}
+					{(["Durable Telecommunications"]?.includes(
+						process.env.REACT_APP_NAME
+					) ||
+						ableToGeneratePocketfi) &&
+						usecase?.usecase?.fundWalletPocketfi === "enable" && (
+							<PocketfiLinkedAccount
+								account={wallet?.balance?.pocketfiAccount}
+								banks={pocketfiBanks}
+								loading={loading === "manage-pocketfi"}
+								onGenerate={async bank => {
+									setLoading("manage-pocketfi");
+									await generateVirtual("manage-pocketfi", bank);
+									setLoading(false);
+								}}
+							/>
 						)}
 					{(["Durable Telecommunications"]?.includes(
 						process.env.REACT_APP_NAME

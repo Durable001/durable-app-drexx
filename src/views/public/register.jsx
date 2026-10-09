@@ -83,7 +83,7 @@ const Register = () => {
 			<>
 				<h3 className="text-capitalize text-center">Create account</h3>
 				<small className="mb-4 d-block text-center">
-					Enjoy the things that you love!
+					Cheap data abi? Oya come!
 				</small>
 				<form className="mt-4">
 					<div className="mb-3">

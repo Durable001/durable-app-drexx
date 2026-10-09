@@ -653,7 +653,7 @@ export const manageFundWalletPaystack = (data, update) => async dispatch => {
 	}
 };
 
-export const generateVirtual = data => async dispatch => {
+export const generateVirtual = (data, payload) => async dispatch => {
 	try {
 		let res;
 		if (data === "manage-budpay")
@@ -665,6 +665,11 @@ export const generateVirtual = data => async dispatch => {
 		else if (data === "manage-paymentpoint")
 			res = await axios.post(
 				`/api/v1/wallet/generate-virtual-account-paymentpoint`
+			);
+		else if (data === "manage-pocketfi")
+			res = await axios.post(
+				`/api/v1/wallet/generate-virtual-account-pocketfi`,
+				{ bank: payload }
 			);
 		else if (data === "manage-billstack")
 			res = await axios.post(
