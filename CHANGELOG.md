@@ -1,5 +1,37 @@
 # Changelog
 
+## Landing "Tap to Install" button + install bottom sheet
+A gold **Tap to Install** (desktop: **Click to Install**) button now sits in the landing hero, above the Scroll hint. It opens a
+bottom sheet titled **Install {app name} on your {device}** (iPhone, iPad, Android phone, Android tablet, Windows PC, Mac,
+Chromebook, Linux PC). What the sheet offers depends on the device:
+
+| Device / state | Sheet shows |
+|---|---|
+| Android, Windows, Mac, Linux, ChromeOS (Chromium, install prompt available) | **Install app** button -> fires the browser's native install dialog; the sheet closes on accept / dismiss |
+| iPhone / iPad | 3 steps for **Safari's own Share button** + a look-alike of the "Add to Home Screen" row to find, and **Got it**. Non-Safari iOS browsers get an "open in Safari" hint |
+| No install prompt available (already installed, Firefox / desktop Safari, `next dev`) | Browser-menu steps + an "Already installed? open it from..." note, so the button is never a dead end |
+| Already running as the installed app, or just installed (`appinstalled`) | Button hidden |
+
+Note: iOS gives websites no way to open "Add to Home Screen". `navigator.share` was tried first, but on a real iPhone it opens a
+generic share sheet WITHOUT that action (it exists only in Safari's own Share menu, far down the list), so it is not used on iOS.
+`install()` now returns `"instructions"` on iOS, which also makes the mobile banner open its steps modal instead of that sheet.
+The browser only fires the install prompt on a production build with the service
+worker registered, so test with `pnpm build && pnpm start`, not `pnpm dev`.
+
+- **NEW `src/components/ui/BottomSheet.jsx`**: reusable bottom sheet (portal, slide-up / slide-out, blurred backdrop, swipe-down on the
+  handle to dismiss, Esc, backdrop tap, page scroll lock, focus moved in and restored, centred card on wide screens,
+  reduced-motion safe). Drag is written straight to the DOM (no re-renders).
+- **NEW `src/components/pwa/InstallSheet.jsx`**: the sheet content (prompt / ios / manual modes above).
+- **NEW `src/components/pwa/InstallCta.jsx`**: the hero button + sheet state; closes itself when the app gets installed.
+- **NEW `src/constants/install.js`**: button labels, benefit chips and all step copy (edit wording here).
+- `src/lib/pwa.js`: `detectEnvironment()` also returns `deviceName` and `iosSafari`.
+- `src/hooks/usePwaInstall.js`: also returns `mode` (`prompt` | `ios` | `manual`) and `showInstallCta`. Existing fields and the
+  mobile banner / desktop top-bar button behave exactly as before.
+- `src/components/landing/components/Hero.jsx`: renders `<InstallCta />` above both text layers (the scroll-inversion circle never
+  covers or duplicates the button).
+- `src/styles/landing.css` (`.hero-install`) and `src/styles/theme.css` (`.bs-*`, `.install-sheet-*`, `.install-benefits`): styles.
+  Sheet is glass (blur + saturate) with an opaque fallback; z-index 2500 (above modals, below pull-to-refresh and toasts).
+
 
 ## v2.0.0 – App Makeover
 

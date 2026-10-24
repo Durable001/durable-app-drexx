@@ -37,6 +37,20 @@ export async function promptInstall() {
   return outcome; // "accepted" | "dismissed"
 }
 
+/** In-app / third-party iOS browsers where "Add to Home Screen" may be missing or hidden. */
+const IOS_NON_SAFARI = /CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|GSA\/|FBAN|FBAV|Instagram|Line\/|MicroMessenger|Snapchat/;
+
+/** Human name for the install sheet title: "iPhone", "Android phone", "Windows PC"... */
+function detectDeviceName(ua, ios, android) {
+  if (ios) return /iPhone/.test(ua) ? "iPhone" : /iPod/.test(ua) ? "iPod touch" : "iPad"; // iPadOS reports as a Mac
+  if (android) return /Mobile/i.test(ua) ? "Android phone" : "Android tablet";
+  if (/CrOS/.test(ua)) return "Chromebook";
+  if (/Windows/i.test(ua)) return "Windows PC";
+  if (/Macintosh|Mac OS X/i.test(ua)) return "Mac";
+  if (/Linux|X11/i.test(ua)) return "Linux PC";
+  return "device";
+}
+
 export function detectEnvironment() {
   const ua = navigator.userAgent || "";
   const isIPadOS = navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
@@ -44,6 +58,8 @@ export function detectEnvironment() {
   const android = /Android/i.test(ua);
   return {
     platform: ios ? "ios" : android ? "android" : "desktop",
+    deviceName: detectDeviceName(ua, ios, android),
+    iosSafari: ios && !IOS_NON_SAFARI.test(ua),
     standalone: isStandalone(),
   };
 }

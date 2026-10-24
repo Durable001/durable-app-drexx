@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { FiArrowDown } from "react-icons/fi";
 import { HERO_COPY } from "@/constants/landing";
 import { useInversionScroll } from "@/hooks/useInversionScroll";
+import InstallCta from "@/components/pwa/InstallCta";
 
 /** The same copy is rendered twice: ink on canvas, and white inside the circle. */
 const HeroCopy = () => (
@@ -38,6 +39,9 @@ const Hero = () => {
         <div ref={lightRef} className="icsa-layer icsa-light" aria-hidden="true">
           <HeroCopy />
         </div>
+
+        {/* real (clickable) button lives above both text layers so the circle never covers it */}
+        <InstallCta />
       </section>
     </div>
   );

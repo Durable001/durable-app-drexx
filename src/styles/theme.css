@@ -423,6 +423,49 @@ hr { border-color: var(--line); opacity: 1; }
 @keyframes slide-down { from { transform: translateY(-100%); opacity: 0; } to { transform: none; opacity: 1; } }
 @media (max-width: 380px) { .install-text span { display: none; } }
 
+/* ---------- bottom sheet (components/ui/BottomSheet) ---------- */
+.bs-root { position: fixed; inset: 0; z-index: 2500; display: flex; align-items: flex-end; justify-content: center; pointer-events: none; }
+.bs-root.is-open { pointer-events: auto; }
+.bs-backdrop {
+	position: absolute; inset: 0; background: rgba(20, 4, 34, 0.5); opacity: 0; transition: opacity 0.28s ease;
+	-webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+}
+.bs-root.is-open .bs-backdrop { opacity: 1; }
+.bs-sheet {
+	position: relative; width: 100%; max-width: 480px; max-height: 90vh; max-height: 90dvh; overflow-y: auto; overscroll-behavior: contain;
+	padding: 0 20px calc(22px + env(safe-area-inset-bottom, 0px)); outline: none;
+	border-radius: 26px 26px 0 0; border: 1px solid rgba(255, 255, 255, 0.8); border-bottom: 0;
+	background: rgba(255, 255, 255, 0.9); -webkit-backdrop-filter: blur(22px) saturate(160%); backdrop-filter: blur(22px) saturate(160%);
+	box-shadow: 0 -14px 44px rgba(34, 6, 54, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+	transform: translateY(100%); transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.bs-root.is-open .bs-sheet { transform: none; }
+.bs-grab { display: flex; justify-content: center; padding: 10px 0 12px; cursor: grab; touch-action: none; }
+.bs-handle { width: 42px; height: 5px; border-radius: 999px; background: var(--line); }
+.bs-close { position: absolute; top: 12px; right: 12px; }
+@media (min-width: 576px) {
+	.bs-root { padding-bottom: 16px; }
+	.bs-sheet { border-radius: 26px; border-bottom: 1px solid rgba(255, 255, 255, 0.8); }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .bs-sheet { background: #fff; } }
+@media (prefers-reduced-motion: reduce) { .bs-sheet, .bs-backdrop { transition-duration: 0.01s; } }
+
+/* ---------- install sheet content ---------- */
+.install-sheet-head { display: flex; align-items: center; gap: 14px; padding-right: 36px; }
+.install-sheet-icon { flex-shrink: 0; border-radius: 15px; background: #fff; box-shadow: var(--shadow-md); }
+.install-sheet-title { margin: 0; font-size: 1.15rem; font-weight: 800; line-height: 1.2; letter-spacing: -0.02em; color: var(--ink); }
+.install-sheet-sub { margin: 4px 0 0; font-size: 0.86rem; color: var(--ink-soft); }
+.install-benefits { list-style: none; margin: 18px 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.install-benefits li {
+	display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 6px; border-radius: 14px;
+	background: var(--brand-soft); color: var(--brand); font-size: 0.74rem; font-weight: 650; text-align: center; line-height: 1.2;
+}
+.install-sheet .install-steps { margin: 18px 0 14px; }
+.install-mock { display: flex; align-items: center; justify-content: space-between; margin: 0 0 14px; padding: 13px 16px; border-radius: 14px; background: #3a3a3c; color: #fff; font-size: 0.95rem; }
+.install-sheet-note { margin: 0 0 14px; font-size: 0.8rem; color: var(--ink-soft); line-height: 1.5; }
+.install-sheet-note.warn { padding: 10px 12px; border-radius: 12px; background: var(--gold-soft); color: var(--brand-deep); }
+.install-sheet-btn { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 14px; font-weight: 700; }
+
 
 /* ==========================================================================
    Wallet page
