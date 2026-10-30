@@ -43,7 +43,11 @@ export function useAuthRedirects({ auth, page, isRoot, pathname, search }) {
   return {
     sessionReady,
     isAppArea,
-    // true while a redirect is about to happen, so no wrong screen flashes
-    redirecting: !auth?.user && (isAppArea || (isRoot && standalone)),
+    // true while a redirect is about to happen, so no wrong screen flashes.
+    // Includes a freshly logged-in user still sitting on /login or /register: for that
+    // instant the guest pages are gone from the registry, which used to flash "Page not found".
+    redirecting: auth?.user
+      ? AUTH_ONLY_REDIRECT.includes(page)
+      : isAppArea || (isRoot && standalone),
   };
 }

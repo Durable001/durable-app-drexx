@@ -11,7 +11,6 @@ import { TOKEN } from "@/Data/Actions/ActionTypes";
 import { SetAuthToken, SetDefaultHeaders } from "@/Data/Config";
 import AppShell from "@/components/layout/AppShell";
 import GlobalModals from "@/components/feedback/GlobalModals";
-import InstallBanner from "@/components/pwa/InstallBanner";
 import PwaRegister from "@/components/pwa/PwaRegister";
 import PullToRefresh from "@/components/pwa/PullToRefresh";
 import Snow from "@/components/ui/Snow";
@@ -34,7 +33,6 @@ function Shell({ children }) {
       <PwaRegister />
       <PullToRefresh />
       <Snow />
-      <InstallBanner />
       {auth?.user ? (
         <AppShell>{children}</AppShell>
       ) : (

@@ -205,15 +205,17 @@ export const loginUser2FA = userData => async dispatch => {
 };
 
 // REGISTER ACTION
+// Resolves to true when the account was created, false otherwise, so the page can
+// move on right after the request instead of waiting on a store flag.
 export const registerUser = userData => async dispatch => {
 	dispatch(clearErrors());
-	console.log({ userData });
 	try {
 		var res = await axios.post(
 			"/api/v1/user",
 			{ ...userData },
 			{
 				baseURL: useURL4 || useURL,
+				timeout: 60000, // never leave the sign up button spinning forever
 				// baseURL: type === "data" ? useURL2 || useURL : useURL,
 			}
 		);
@@ -223,6 +225,7 @@ export const registerUser = userData => async dispatch => {
 			payload: res.data,
 		});
 		toast.success(res.data.msg, { autoClose: 5000 });
+		return true;
 	} catch (err) {
 		if (err?.response?.status === 429 || err?.response?.status === 405)
 			toast.error(err?.response?.data ? err?.response?.data : err?.message);
@@ -230,8 +233,16 @@ export const registerUser = userData => async dispatch => {
 		let error = err.response?.data?.error;
 		if (error) {
 			dispatch(returnErrors({ error, status: err?.response?.status }));
+		} else if (err?.response?.status !== 429 && err?.response?.status !== 405) {
+			// timeout / offline / unexpected body: tell the user instead of failing silently
+			toast.error(
+				err?.code === "ECONNABORTED"
+					? "Sign up is taking too long. Please check your connection and try again."
+					: err?.message || "Could not complete sign up, please try again."
+			);
 		}
 		dispatch({ type: REGISTER_USER_FAIL });
+		return false;
 	}
 };
 

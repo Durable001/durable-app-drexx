@@ -41,7 +41,7 @@ export default function PageRouter() {
   // a background refresh must not cover the persistent nav.
   if (auth?.token && auth?.loading) return <PageLoader fullscreen={!auth?.user} />;
 
-  if (redirecting) return <PageLoader fullscreen />;
+  if (redirecting) return <PageLoader fullscreen={!auth?.user} />;
 
   if (isRoot) return auth?.user ? <AppHome /> : <Landing />;
 

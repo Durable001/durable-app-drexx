@@ -7,7 +7,7 @@ import { Buttons, EyeToggle } from "@/Utils";
 import { toast } from "react-toastify";
 
 const Register = () => {
-	const { registerUser, auth } = useContext(GlobalState);
+	const { registerUser } = useContext(GlobalState);
 
 	useEffect(() => {
 		window.scrollTo(0, 0);
@@ -27,7 +27,6 @@ const Register = () => {
 		[state, setState] = useState(init),
 		[loading, setLoading] = useState(false),
 		[terms, setTerms] = useState(false),
-		[submit, setSubmit] = useState(false),
 		navigate = useNavigate(),
 		textChange =
 			name =>
@@ -44,6 +43,7 @@ const Register = () => {
 
 	let handleSubmit = async e => {
 		e.preventDefault();
+		if (loading) return;
 		if (
 			!state?.password ||
 			!state?.email ||
@@ -65,18 +65,14 @@ const Register = () => {
 				`Password must be at least 8 characters long, contains at least 1 number, 1 uppercase, 1 lowercase letter and 1 special character`
 			);
 		setLoading(true);
-		await registerUser(state);
-		setLoading(false);
-		setSubmit(true);
-	};
-
-	useEffect(() => {
-		if (submit && auth?.isRegistered) {
-			navigate(auth?.regCase === "enable" ? "/activate" : "/login");
-			setSubmit(false);
+		try {
+			const created = await registerUser(state);
+			// account created -> login page
+			if (created) navigate("/login");
+		} finally {
+			setLoading(false);
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [submit, auth?.isRegistered, auth?.regCase]);
+	};
 
 	return (
 		<DefaultAuthComponent nozoom>
@@ -85,7 +81,7 @@ const Register = () => {
 				<small className="mb-4 d-block text-center">
 					Cheap data abi? Oya come!
 				</small>
-				<form className="mt-4">
+				<form className="mt-4" onSubmit={handleSubmit}>
 					<div className="mb-3">
 						<label htmlFor="firstName">First Name</label>
 						<input
@@ -159,8 +155,7 @@ const Register = () => {
 							Referral Code <small className="text-muted">(optional)</small>
 						</label>
 						<input
-							type="tel"
-							required
+							type="text"
 							name="referral"
 							className="form-control py-3"
 							value={state.referral}
@@ -183,7 +178,7 @@ const Register = () => {
 						</span>
 					</p>
 					<Buttons
-						onClick={handleSubmit}
+						type="submit"
 						loading={loading}
 						disabled={!terms}
 						title={"sign up"}
